@@ -64,15 +64,15 @@ This project is built upon the work from [Alkoby/Bone-Fracture-Detection](https:
         </a>
       </td>
       <td align="center">
-        <a href="https://github.com/">
+        <a href="https://github.com/sins42">
           <img src="https://avatars.githubusercontent.com/u/" width="100px;" alt="Sindhuja Kumar"/>
           <br />
           <b>Sindhuja Kumar</b>
         </a>
-        <a href="https://www.linkedin.com/in/tsaichiehhuang0307/" target="_blank">
+        <a href="https://www.linkedin.com/in/sindhuja-kumar/" target="_blank">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/108px-LinkedIn_icon.svg.png" width="20px;" alt="LinkedIn"/>
         </a>
-        <a href="mailto:a0970605512@gmail.com" target="_blank">
+        <a href="mailto:sins@bu.edu" target="_blank">
           <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Email_icon.svg" width="20px;" alt="Email"/>
         </a>
     </tr>
