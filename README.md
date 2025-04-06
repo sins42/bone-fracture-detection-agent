@@ -65,7 +65,7 @@ This project is built upon the work from [Alkoby/Bone-Fracture-Detection](https:
       </td>
       <td align="center">
         <a href="https://github.com/sins42">
-          <img src="https://avatars.githubusercontent.com/u/" width="100px;" alt="Sindhuja Kumar"/>
+          <img src="https://avatars.githubusercontent.com/u/132231904?v=4" width="100px;" alt="Sindhuja Kumar"/>
           <br />
           <b>Sindhuja Kumar</b>
         </a>
