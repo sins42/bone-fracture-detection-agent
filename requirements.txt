@@ -1,0 +1,17 @@
+pdfplumber
+langchain
+langchain-huggingface
+langchain-community
+pypdf
+langchain_chroma
+chromadb
+smolagents
+python-dotenv
+gradio
+sentence-transformers
+openai
+tiktoken
+langchain-openai
+sentence-transformers
+langchain-ollama
+nltk
