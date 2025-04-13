@@ -1,0 +1,16 @@
+git clone https://github.com/Alkoby/Bone-Fracture-Detection.git
+
+cd your_path/Bone-Fracture-Detection
+# for example, /projectnb/dl4ds/students/caslow/Bone-Fracture-Detection
+
+module load miniconda
+
+conda activate fracture
+	If error: conda create -n fracture python=3.7
+
+pip install -r requirements.txt
+
+module load tensorflow
+
+python prediction_test.Py
+
