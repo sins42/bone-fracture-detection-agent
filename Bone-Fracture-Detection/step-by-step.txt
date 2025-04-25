@@ -1,7 +1,8 @@
-git clone https://github.com/Alkoby/Bone-Fracture-Detection.git
+git clone https://github.com/CaslowChien/bone-fracture-detection-chatbot.git
 
-cd your_path/Bone-Fracture-Detection
-# for example, /projectnb/dl4ds/students/caslow/Bone-Fracture-Detection
+qrsh -pe omp 4 -P dl4ds -l gpus=1 -l gpu_c=8.0
+
+cd /projectnb/dl4ds/students/caslow/Bone-Fracture-Detection
 
 module load miniconda
 
@@ -14,3 +15,10 @@ module load tensorflow
 
 python prediction_test.Py
 
+
+[If already install]
+cd /projectnb/dl4ds/students/caslow/Bone-Fracture-Detection
+module load miniconda
+conda activate fracture
+module load tensorflow
+python -m training_parts
