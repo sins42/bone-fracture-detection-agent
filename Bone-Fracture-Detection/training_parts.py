@@ -5,7 +5,25 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
+import wandb
+import random
 
+SEED = 1
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+
+class CustomWandbCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs:
+            wandb.log(logs, step=epoch)
+
+class LogLearningRate(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        lr = self.model.optimizer.lr
+        if isinstance(lr, tf.keras.optimizers.schedules.LearningRateSchedule):
+            lr = lr(epoch)
+        wandb.log({"learning_rate": float(tf.keras.backend.get_value(lr))}, step=epoch)
 
 # load images to build and train the model
 #                       ....                                     /    img1.jpg
@@ -45,6 +63,19 @@ def load_path(path):
                             )
     return dataset
 
+wandb.init(
+        project="FractureDetection",
+        name=f"ResNet50-parts",
+        config={
+            "model": "ResNet50",
+            "part": "parts",
+            "epochs": 25,
+            "batch_size": 64,
+            "optimizer": "Adam",
+            "learning_rate": 0.0001
+        },
+        reinit=True
+    )
 
 # load data from path
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
@@ -114,7 +145,8 @@ test_images = test_generator.flow_from_dataframe(
     color_mode='rgb',
     class_mode='categorical',
     batch_size=32,
-    shuffle=False
+    shuffle=False,
+    seed = SEED
 )
 
 # we use rgb 3 channels and 224x224 pixels images, use feature extracting , and average pooling
@@ -134,8 +166,10 @@ outputs = tf.keras.layers.Dense(len(Labels), activation='softmax')(x)
 model = tf.keras.Model(inputs, outputs)
 print(model.summary())
 
+optimizer = Adam(learning_rate=0.0001)
+
 # Adam optimizer with low learning rate for better accuracy
-model.compile(optimizer=Adam(learning_rate=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
 
 # early stop when our model is over fit or vanishing gradient, with restore best values
 callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
@@ -143,26 +177,11 @@ history = model.fit(train_images, validation_data=val_images, epochs=25,
                     callbacks=[callbacks])
 
 # save model to this path
-model.save(THIS_FOLDER + "/weights/ResNet50_BodyParts.h5")
+model_path = THIS_FOLDER + "/new_weights/ResNet50_BodyParts.h5"
 results = model.evaluate(test_images, verbose=0)
+wandb.log({"Test Loss": results[0], "Test Accuracy": results[1]})
 print(results)
 print(f"Test Accuracy: {np.round(results[1] * 100, 2)}%")
 
-
-# create plots for accuracy and save it
-plt.plot(history.history['accuracy'])
-plt.plot(history.history['val_accuracy'])
-plt.title('model accuracy')
-plt.ylabel('accuracy')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
-plt.show()
-
-# create plots for loss and save it
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
-plt.show()
+model.save(model_path)
+wandb.save(model_path)
