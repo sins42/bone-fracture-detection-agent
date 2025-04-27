@@ -1,81 +1,114 @@
-import os
-import shutil
-from langchain.embeddings import HuggingFaceEmbeddings
+# vector_store.py
 from langchain.vectorstores import Chroma
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.llms import Ollama
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import EmbeddingsFilter
-from langchain.llms import Ollama  # Import Ollama for potential direct use
-from config import DEFAULT_LLM, OPENAI_DEFAULT_MODEL, OLLAMA_DEFAULT_MODEL
-from openai_llm import OpenAILLM
-from ollama_llm import OllamaLLM
+from langchain.prompts import PromptTemplate
+from config import DEFAULT_LLM, OLLAMA_DEFAULT_MODEL, VECTOR_DB_DIR, TOP_K, SEARCH_TYPE
+import logging
+import os
 
-# --- Vector Store Management ---
-def create_vector_store(chunks, persist_dir: str):
-    """Create and persist a Chroma vector store using HuggingFace embeddings."""
-    if os.path.exists(persist_dir):
-        print(f"Removing existing vector store from {persist_dir}")
-        shutil.rmtree(persist_dir)
+# Set up logging
+logger = logging.getLogger(__name__)
 
-    print(f"Total chunks received for vector store: {len(chunks)}")
-    if chunks:
-        print(f"Example chunk: {chunks[0].page_content[:300]}")
+def get_embedding_model():
+    """
+    Initializes the HuggingFace embedding model.
+    """
+    return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
+def get_llm():
+    """
+    Initializes the Ollama LLM.
+    """
+    return Ollama(model=OLLAMA_DEFAULT_MODEL)
+
+def create_vector_store(document_chunks, persist_directory):
+    """
+    Creates a Chroma vector store from a list of Document objects and persists it to disk.
+    """
     try:
-        embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        print(f"Building and saving the new vector store at {persist_dir} with HuggingFace embeddings...")
+        if not document_chunks:
+            logging.warning("No document chunks provided. Skipping vector store creation.")
+            return None
+
+        embedding = get_embedding_model()
         vector_db = Chroma.from_documents(
-            documents=chunks,
-            embedding=embedding_model,
-            persist_directory=persist_dir
+            documents=document_chunks,
+            embedding=embedding,
+            persist_directory=persist_directory,
         )
+        vector_db.persist()
         return vector_db
-
     except Exception as e:
-        print(f"Error creating vector store: {e}")
+        logging.error(f"Error creating vector store: {e}")
         return None
 
-def load_vector_store(persist_dir: str):
-    """Loads an existing Chroma vector store using HuggingFace embeddings."""
+def load_vector_store(persist_directory):
+    """
+    Loads an existing Chroma vector store from disk.
+    """
     try:
-        embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        vector_db = Chroma(persist_directory=persist_dir, embedding_function=embedding_model)
-        print(f"Vector store loaded from {persist_dir}")
+        embedding = get_embedding_model()
+        vector_db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
         return vector_db
     except Exception as e:
-        print(f"Error loading vector store: {e}")
+        logging.error(f"Error loading vector store: {e}")
         return None
 
-# --- Question Answering with LLM (Manual Prompting) ---
-def query_vector_store(vector_db, query, k_retriever=3, score_threshold=0.3):
-    """Queries the vector store and generates a natural language response using an LLM with manual prompt construction."""
+def query_vector_store(vector_db, query):
+    """
+    Queries the vector store with a given query and retrieves relevant documents.
+    """
     if vector_db is None:
-        print("Error: Vector store not initialized.")
-        return "Error: Vector store not initialized."
-
-    llm_engine = None
-    if DEFAULT_LLM == "openai":
-        llm_engine = OpenAILLM(model_name=OPENAI_DEFAULT_MODEL)
-    elif DEFAULT_LLM == "ollama":
-        llm_engine = OllamaLLM(model_name=OLLAMA_DEFAULT_MODEL)
-    else:
-        raise ValueError(f"Unsupported LLM type: {DEFAULT_LLM}")
-
-    search_kwargs = {
-        "k": k_retriever,
-        "score_threshold": score_threshold
-    }
-
-    retriever = vector_db.as_retriever(
-        search_type="similarity_score_threshold",
-        search_kwargs=search_kwargs
-    )
-
-    relevant_docs = retriever.get_relevant_documents(query)
-    context = "\n".join([doc.page_content for doc in relevant_docs])
+        return "Error: Vector store is not initialized."
 
     try:
-        response = llm_engine.generate_response(question=query, context=context)
+        llm = get_llm()
+
+        # 1. Retrieval
+        if SEARCH_TYPE == "similarity":
+            retrieved_docs = vector_db.similarity_search(query, k=TOP_K)
+        elif SEARCH_TYPE == "mmr":
+            retrieved_docs = vector_db.max_marginal_relevance_search(query, k=TOP_K)
+        elif SEARCH_TYPE == "hybrid":
+            similarity_docs = vector_db.similarity_search(query, k=TOP_K // 2)
+            mmr_docs = vector_db.max_marginal_relevance_search(query, k=TOP_K // 2)
+            retrieved_docs = similarity_docs + mmr_docs
+        else:
+            retrieved_docs = vector_db.similarity_search(query, k=TOP_K)
+
+        if not retrieved_docs:
+            return "I'm sorry, I couldn't find any relevant information in the documents."
+
+        # 2. Contextual Compression
+        compressor = EmbeddingsFilter(embeddings=get_embedding_model(), similarity_threshold=0.7)
+        retriever = ContextualCompressionRetriever(base_compressor=compressor, base_retriever=vector_db.as_retriever())
+        compressed_docs = retriever.get_relevant_documents(query=query)
+
+        # 3. Prompt Engineering
+        prompt_template = """System: Your name is SkeletaX, a bone health expert who helps people with their questions about bone fractures in Boston, Massachusetts, United States.
+
+        Given the user's question and the following relevant information, provide a clear and concise answer.  Cite the source documents by their title.
+
+        If you cannot answer the question based on the provided information, simply respond with: 'Hmm, I'm not sure about that. Let me see if I can find more information.'
+
+        Context:
+        {context}
+
+        User Question: {question}
+        Answer:
+        """
+        prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+
+        context_text = "\n\n".join([f"Document Title: {doc.metadata['source']}\nContent: {doc.page_content}" for doc in compressed_docs])
+        final_prompt = prompt.format(context=context_text, question=query)
+        logger.info(f"Final Prompt being sent to LLM:\n{final_prompt}")
+        response = llm(final_prompt)
+        logger.info(f"LLM Response:\n{response}")
         return response
+
     except Exception as e:
-        print(f"Error during LLM query: {e}")
-        return "Sorry, there was an error processing your request."
+        logging.error(f"Error querying vector store: {e}")
+        return f"Sorry, there was an error processing your query: {e}"
