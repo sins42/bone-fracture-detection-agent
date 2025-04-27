@@ -1,0 +1,12 @@
+# Sensitive Data
+.env
+
+# Temprorary PDF extration directory from zip file 
+temp_pdfs/
+
+# Virtual environment directory
+venv/
+
+# bytecode-compiled versions of Python files.
+llm-poc\__pycache__/
+*.pyc
