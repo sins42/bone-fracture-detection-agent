@@ -201,3 +201,81 @@ def query_vector_store(vector_db: Optional[Chroma], query: str) -> str:
     except Exception as e:
         logger.error(f"Error querying vector store: {e}")
         return "I'm having trouble processing your question right now. Please try again or rephrase your question about bone fractures."
+
+def generate_xray_report(vector_db, classification_result, user_query):
+    """
+    Generates a comprehensive report based on X-ray classification and user query.
+    
+    Args:
+        vector_db (Chroma): The vector database for retrieving relevant information
+        classification_result (dict): Results from the X-ray classification
+        user_query (str): The user's question about the X-ray
+        
+    Returns:
+        str: A comprehensive report in markdown format
+    """
+    if vector_db is None:
+        return "Error: Vector store is not initialized. Please try again later."
+
+    try:
+        llm = get_llm()
+        
+        # Formulate enhanced queries based on classification results
+        body_part = classification_result["body_part"]
+        fracture_status = classification_result["fracture_status"]
+        
+        # Create targeted queries based on classification results
+        queries = [
+            f"{body_part} fracture overview",
+            f"{body_part} {fracture_status} x-ray characteristics",
+            f"{body_part} fracture treatment options",
+            f"{body_part} fracture recovery time",
+            f"{body_part} fracture rehabilitation"
+        ]
+        
+        # Retrieve relevant documents for each query
+        all_docs = []
+        for query in queries:
+            docs = vector_db.similarity_search(query, k=2)  # Get top 2 most relevant docs per query
+            all_docs.extend(docs)
+            
+        # Remove duplicates if any
+        unique_docs = []
+        seen_content = set()
+        for doc in all_docs:
+            if doc.page_content not in seen_content:
+                unique_docs.append(doc)
+                seen_content.add(doc.page_content)
+        
+        # Compile context from retrieved documents
+        context_text = ""
+        for i, doc in enumerate(unique_docs):
+            source = doc.metadata.get('source', 'Unknown')
+            heading = doc.metadata.get('heading', 'General Information')
+            context_text += f"Document {i+1}: {source} - {heading}\n{doc.page_content}\n\n"
+        
+        # Format the classification results for the prompt
+        confidence_percentage = f"{classification_result['confidence'] * 100:.1f}"
+        
+        # Use the specialized X-ray analysis prompt
+        from config import XRAY_ANALYSIS_PROMPT
+        xray_prompt = XRAY_ANALYSIS_PROMPT.format(
+            body_part=body_part,
+            fracture_status=fracture_status.capitalize(),
+            confidence=confidence_percentage,
+            user_question=user_query,
+            context=context_text
+        )
+        
+        # Get the report from the LLM
+        logger.info(f"Generating X-ray analysis report...")
+        response = llm(xray_prompt).strip()
+        
+        # Clean up the response
+        clean_response = extract_response(response)
+        
+        return clean_response
+        
+    except Exception as e:
+        logger.error(f"Error generating X-ray report: {e}")
+        return "I'm having trouble analyzing this X-ray image right now. Please try again or consult with a healthcare professional."

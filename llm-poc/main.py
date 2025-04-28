@@ -141,20 +141,20 @@ def main():
                 return
                 
         # Test the vector store with a sample query
-        logger.info("Testing vector store with a sample query...")
-        test_queries = [
-            "What are the symptoms of an elbow fracture?",
-            "How are hand fractures treated?",
-            "What's the recovery time for a shoulder fracture?"
-        ]
+        # logger.info("Testing vector store with a sample query...")
+        # test_queries = [
+        #     "What are the symptoms of an elbow fracture?",
+        #     "How are hand fractures treated?",
+        #     "What's the recovery time for a shoulder fracture?"
+        # ]
         
-        for query in test_queries:
-            logger.info(f"Testing query: '{query}'")
-            response = query_vector_store(vector_db, query)
-            logger.info(f"Response preview: {response[:100]}...")
-            print(f"\nQuery: {query}\nResponse: {response}\n{'-'*50}")
+        # for query in test_queries:
+        #     logger.info(f"Testing query: '{query}'")
+        #     response = query_vector_store(vector_db, query)
+        #     logger.info(f"Response preview: {response[:100]}...")
+        #     print(f"\nQuery: {query}\nResponse: {response}\n{'-'*50}")
             
-        logger.info("Vector store test completed.")
+        # logger.info("Vector store test completed.")
         
     except Exception as e:
         logger.error(f"An error occurred in main: {e}")

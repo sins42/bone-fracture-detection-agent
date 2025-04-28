@@ -16,3 +16,6 @@ sentence-transformers
 langchain-ollama
 nltk
 PyPDF2
+Pillow
+tensorflow
+keras
