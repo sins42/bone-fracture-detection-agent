@@ -9,4 +9,13 @@ venv/
 
 # bytecode-compiled versions of Python files.
 llm-poc\__pycache__/
-*.pyc
+*.pyc 
+
+llm-poc\SkeletaX_chroma_db
+*
+
+llm-poc\skeletax.log
+*
+
+llm-poc\skeletax_app.log
+*
