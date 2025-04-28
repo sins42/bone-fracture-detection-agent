@@ -8,6 +8,7 @@ from langchain.prompts import PromptTemplate
 from config import DEFAULT_LLM, OLLAMA_DEFAULT_MODEL, VECTOR_DB_DIR, TOP_K, SEARCH_TYPE
 import logging
 import os
+from langchain_huggingface import HuggingFaceEmbeddings as NewHuggingFaceEmbeddings
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ def get_embedding_model():
     """
     Initializes the HuggingFace embedding model.
     """
-    return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    return NewHuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 def get_llm():
     """
@@ -39,7 +40,6 @@ def create_vector_store(document_chunks, persist_directory):
             embedding=embedding,
             persist_directory=persist_directory,
         )
-        vector_db.persist()
         return vector_db
     except Exception as e:
         logging.error(f"Error creating vector store: {e}")
@@ -90,10 +90,10 @@ def query_vector_store(vector_db, query):
         # 3. Prompt Engineering
         prompt_template = """System: Your name is SkeletaX, a bone health expert who helps people with their questions about bone fractures in Boston, Massachusetts, United States.
 
-        Given the user's question and the following relevant information, provide a clear and concise answer.  Cite the source documents by their title.
-
-        If you cannot answer the question based on the provided information, simply respond with: 'Hmm, I'm not sure about that. Let me see if I can find more information.'
-
+        Given the user's question and the following relevant information, provide a clear and concise answer.  
+        
+        Do not include any thinking steps or explanations. Just provide the answer. Cite the source documents by their title.
+        
         Context:
         {context}
 
@@ -105,7 +105,11 @@ def query_vector_store(vector_db, query):
         context_text = "\n\n".join([f"Document Title: {doc.metadata['source']}\nContent: {doc.page_content}" for doc in compressed_docs])
         final_prompt = prompt.format(context=context_text, question=query)
         logger.info(f"Final Prompt being sent to LLM:\n{final_prompt}")
-        response = llm(final_prompt)
+        response = llm(final_prompt).strip() # remove leading/trailing spaces
+        response = response.split("Answer:")[-1].strip() # Remove "Answer:" if it appears
+        response = response.split("</think>")[-1].strip()  # Remove "</think>" and anything before it
+        response = response.split("<think>")[-1].strip()  # Remove "<think>" and anything before it
+
         logger.info(f"LLM Response:\n{response}")
         return response
 

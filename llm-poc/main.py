@@ -1,17 +1,32 @@
 # main.py
 # Module imports
-from config import load_api_key, VECTOR_DB_DIR, TEMP_PDF_DIR, DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP # Import the chunking variables
-from pdf_processing import extract_zip, process_single_pdf
-from text_processing import create_chunks_with_structured_data
-from vector_store import create_vector_store, load_vector_store
 import logging
 import os
 import shutil
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
+from config import (
+    load_api_key,
+    VECTOR_DB_DIR,
+    TEMP_PDF_DIR,
+    DATA_DIR,
+    CHUNK_SIZE,
+    CHUNK_OVERLAP,
+)  # Explicitly import variables
+from pdf_processing import extract_zip, process_single_pdf
+from text_processing import create_chunks_with_structured_data
+from vector_store import (
+    create_vector_store,
+    load_vector_store,
+    query_vector_store,
+)  # Import query_vector_store
+
 
 # Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 def load_and_process_pdfs(zip_path):
     """
@@ -31,7 +46,9 @@ def load_and_process_pdfs(zip_path):
             return []
 
         all_chunks = []
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP) # Use the values from config.py
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP
+        )  # Use the values from config.py
 
         for pdf in pdf_files:
             markdown_sections = process_single_pdf(pdf)
@@ -39,14 +56,19 @@ def load_and_process_pdfs(zip_path):
                 logging.warning(f"No markdown sections extracted from {pdf}. Skipping.")
                 continue  # Skip to the next PDF
 
-            enriched_chunks = create_chunks_with_structured_data(markdown_sections, text_splitter)
+            enriched_chunks = create_chunks_with_structured_data(
+                markdown_sections, text_splitter
+            )
             for chunk in enriched_chunks:
-                chunk.metadata["source"] = os.path.basename(pdf)  # Ensure source is always present
+                chunk.metadata["source"] = os.path.basename(
+                    pdf
+                )  # Ensure source is always present
                 all_chunks.append(chunk)
         return all_chunks
     except Exception as e:
         logging.error(f"Error processing PDFs: {e}")
         return []  # Return empty list on error
+
 
 def main():
     """
@@ -57,7 +79,9 @@ def main():
 
     # --- Force recreation of the vector store ---
     if os.path.exists(VECTOR_DB_DIR):
-        logging.info(f"Removing existing vector store at {VECTOR_DB_DIR} to force recreation...")
+        logging.info(
+            f"Removing existing vector store at {VECTOR_DB_DIR} to force recreation..."
+        )
         shutil.rmtree(VECTOR_DB_DIR, ignore_errors=True)
     # --- End of force recreation ---
 
@@ -76,7 +100,9 @@ def main():
 
             # Tests
             if document_chunks:
-                logging.info(f"Example chunk:\n{document_chunks[0].page_content[:500]}")
+                logging.info(
+                    f"Example chunk:\\n{document_chunks[0].page_content[:500]}"
+                )
                 logging.info(f"Metadata: {document_chunks[0].metadata}")
 
             vector_db = create_vector_store(document_chunks, VECTOR_DB_DIR)
@@ -87,13 +113,16 @@ def main():
                 return  # Exit if vector store creation fails
 
         # Example query (for testing)
-        # query = "What are the symptoms of an elbow fracture?"
-        # response = query_vector_store(vector_db, query)
-        # print(f"Response to query: '{query}':\n{response}")
+        query = "What are the treatment options for an elbow fracture?"
+        response = query_vector_store(vector_db, query)
+        print(f"Response to query: '{query}':\\n{response}")
 
     except Exception as e:
         logging.error(f"An error occurred in main: {e}")
-        print(f"An error occurred: {e}.  Please check the logs for details.") # Inform the user.
+        print(
+            f"An error occurred: {e}.  Please check the logs for details."
+        )  # Inform the user.
+
 
 if __name__ == "__main__":
     main()
