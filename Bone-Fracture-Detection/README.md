@@ -88,9 +88,9 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr
 
 # DEMO
 ### Positive Case
-<img src="images/GUI/PositiveHand.png" width=400>
+<img src="images/PositiveHand.png" width=400>
 
 ### Negative Case
-<img src="images/GUI/NegativeHand.png" width=400>
+<img src="images/NegativeHand.png" width=400>
 
 
