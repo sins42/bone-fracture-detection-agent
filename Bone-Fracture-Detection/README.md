@@ -1,10 +1,4 @@
 # Bone-Fracture-Detection
-## Introduction
- Since long ago, bone fractures was a long standing issue for mankind, and it's classification via x-ray has always depended on human diagnostics – which may be sometimes flawed.
-In recent years, Machine learning and AI based solutions have become an integral part of our lives, in all aspects, as well as in the medical field.
-In the scope of our research and project, we have been studying this issue of classification and have been trying, based on previous attempts and researches, to develop and fine tune a feasible solution for the medical field in terms of identification and classification of various bone fractures, using CNN ( Convolutional Neural Networks ) in the scope of modern models, such as ResNet, DenseNet, VGG16, and so forth.
-After performing multiple model fine tuning attempts for various models, we have achieved classification results lower then the predefined threshold of confidence agreed upon later in this research, but with the promising results we did achieve, we believe that systems of this type, machine learning and deep learning based solutions for identification and classification of bone fractures, with further fine tuning and applications of more advanced techniques such as Feature Extraction, may replace the traditional methods currently employed in the medical field, with much better results.
-
 
 ## Dataset
 The data set we used called MURA and included 3 different bone parts, MURA is a dataset of musculoskeletal radiographs and contains 20,335 images described below:
@@ -65,15 +59,38 @@ This algorithm has the potential to greatly aid medical professionals in detecti
 
 Run mainGUI.Py
 
-# GUI
-### Main
-<img src="images/GUI/main.png" width=400>
+# Training for New Model
 
-### Info-Rules
-<img src="images/GUI/Rules.png" width=400>
+### Baseline (Original Model)
+random_seed = 1
 
-### Test Normal & Fractured
-<img src="images/GUI/normal.png" width=300> <img src="images/GUI/fractured.png" width=300>
+### Elbow_best
+random_seed = 42
+    x = tf.keras.layers.Dense(128, activation='relu')(pretrained_model.output)
+    x = tf.keras.layers.Dropout(0.5)(x)
+    x = tf.keras.layers.Dense(50, activation='relu')(x)
+    x = tf.keras.layers.Dropout(0.3)(x)
 
+
+### Hand_best
+reset to baseline
+
+AdamW(learning_rate=1e-4, weight_decay=1e-5)
+callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-6, verbose=1)
+
+### Shoulder_best
+reset to baseline
+
+AdamW(learning_rate=1e-4, weight_decay=1e-5)
+callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-6, verbose=1)
+
+# DEMO
+### Positive Case
+<img src="images/GUI/PositiveHand.png" width=400>
+
+### Negative Case
+<img src="images/GUI/NegativeHand.png" width=400>
 
 
