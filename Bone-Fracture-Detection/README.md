@@ -32,7 +32,7 @@
 ├── training_fracture.py                # Training script for fracture detection
 ├── training_parts.py                   # Training script for body part classification
 └── README.md                           # This file
-
+```
 ## Dataset
 The data set we used called MURA and included 3 different bone parts, MURA is a dataset of musculoskeletal radiographs and contains 20,335 images described below:
 
