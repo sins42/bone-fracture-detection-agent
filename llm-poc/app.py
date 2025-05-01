@@ -14,7 +14,7 @@ sys.path.append(parent_dir)
 
 # Use importlib to handle the import with hyphens
 import importlib
-module = importlib.import_module("Bone-Fracture-Detection.prediction_for_chatbot")
+module = importlib.import_module("prediction_for_chatbot")
 inference = module.inference
 
 # Set up logging

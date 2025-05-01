@@ -9,10 +9,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Model paths - make these configurable
-MODEL_DIR = os.path.join(os.path.dirname(os.getcwd()), "Bone-Fracture-Detection", "weights")
-MODEL_ELBOW = os.path.join(MODEL_DIR, "ResNet50_Elbow_frac.h5")
-MODEL_HAND = os.path.join(MODEL_DIR, "ResNet50_Hand_frac.h5")
-MODEL_SHOULDER = os.path.join(MODEL_DIR, "ResNet50_Shoulder_frac.h5")
+MODEL_DIR = os.path.join(os.path.dirname(os.getcwd()), "weights")
+MODEL_ELBOW = os.path.join(MODEL_DIR, "ResNet50_Elbow_frac_best.h5")
+MODEL_HAND = os.path.join(MODEL_DIR, "ResNet50_Hand_frac_best.h5")
+MODEL_SHOULDER = os.path.join(MODEL_DIR, "ResNet50_Shoulder_frac_best.h5")
 MODEL_PARTS = os.path.join(MODEL_DIR, "ResNet50_BodyParts.h5")
 
 # Initialize models to None - we'll load them on demand
