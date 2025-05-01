@@ -1,21 +1,19 @@
 # Sensitive Data
 .env
 
-# Temprorary PDF extration directory from zip file 
+# Temporary PDF extraction directory
 temp_pdfs/
 
-# Virtual environment directory
+# Virtual environment
 venv/
 
-# bytecode-compiled versions of Python files.
-llm-poc\__pycache__/
-*.pyc 
+# Python cache
+__pycache__/
+*.pyc
 
-llm-poc\SkeletaX_chroma_db
-*
+# Logs
+llm-poc/skeletax.log
+llm-poc/skeletax_app.log
 
-llm-poc\skeletax.log
-*
-
-llm-poc\skeletax_app.log
-*
+# Chroma DB
+llm-poc/SkeletaX_chroma_db/
