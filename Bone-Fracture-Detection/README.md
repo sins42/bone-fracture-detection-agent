@@ -1,5 +1,38 @@
 # Bone-Fracture-Detection
 
+├── Dataset/                             # (Placeholder) Data directory
+├── __pycache__/                         # Python cache files
+├── images/                              # Images for README/demo
+│   ├── Architecture.png                 # For model architecture 
+│   ├── NegativeHand.png                 # For demo example   
+│   └── PositiveHand.png                 # For demo example
+├── plots/                               # Training evaluation visualizations
+│   ├── FractureDetection/
+│   ├── BodyPartAcc.png
+│   ├── BodyPartLoss.png
+│   └── testPredictions.png
+├── test/                                # Test image folders
+│   ├── Elbow/
+│   ├── Hand/
+│   └── Shoulder/
+├── weights/                             # Pretrained model weights
+│   ├── ResNet50_BodyParts.h5            # Categorize Model
+│   ├── ResNet50_Elbow_frac_best.h5    # Elblow detection our best model
+│   ├── ResNet50_Hand_frac_best.h5    # Hand detection our best model
+│   ├── ResNet50_Shoulder_frac_best.h5    # Shoulder detection our best model
+│   ├── ResNet50_Elbow_frac_baseline.h5    # Elblow detection original model (baseline)
+│   ├── ResNet50_Hand_frac_baseline.h5    # Hand detection original model (baseline)
+│   └── ResNet50_Shoulder_frac_baseline.h5    # Shoulder detection original model (baseline)
+├── evaluation.py                        # Evaluation script for model performance
+├── prediction_for_chatbot.py           # Chatbot + fracture classifier integration
+├── prediction_test.py                  # Script for testing predictions
+├── predictions.py                      # Core prediction module
+├── requirements.txt                    # Required Python packages
+├── step-by-step.txt                    # Setup and training guide
+├── training_fracture.py                # Training script for fracture detection
+├── training_parts.py                   # Training script for body part classification
+└── README.md                           # This file
+
 ## Dataset
 The data set we used called MURA and included 3 different bone parts, MURA is a dataset of musculoskeletal radiographs and contains 20,335 images described below:
 
