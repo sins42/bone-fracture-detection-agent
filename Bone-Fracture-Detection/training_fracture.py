@@ -11,13 +11,14 @@ import random
 
 from tensorflow_addons.optimizers import AdamW
 
-import wandb
 from wandb.sklearn import plot_confusion_matrix
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 from tensorflow.keras.metrics import AUC
 
+from tensorflow.keras.callbacks import ReduceLROnPlateau
 
-SEED = 42
+
+SEED = 1
 random.seed(SEED)
 np.random.seed(SEED)
 tf.random.set_seed(SEED)
@@ -135,7 +136,7 @@ def trainPart(part):
         color_mode='rgb',
         class_mode='categorical',
         batch_size=64,
-        shuffle=True,
+        shuffle=False,
         seed=42,
         subset='training'
     )
@@ -148,7 +149,7 @@ def trainPart(part):
         color_mode='rgb',
         class_mode='categorical',
         batch_size=64,
-        shuffle=True,
+        shuffle=False,
         seed=42,
         subset='validation'
     )
@@ -162,7 +163,7 @@ def trainPart(part):
         class_mode='categorical',
         batch_size=32,
         shuffle=False, 
-        seed = SEED
+        # seed = SEED
     )
 
     # we use rgb 3 channels and 224x224 pixels images, use feature extracting , and average pooling
@@ -174,35 +175,52 @@ def trainPart(part):
 
     # for faster performance
     pretrained_model.trainable = False
-
-    for layer in pretrained_model.layers[-20:]:
-        layer.trainable = True
-
     inputs = pretrained_model.input
     x = tf.keras.layers.Dense(128, activation='relu')(pretrained_model.output)
     x = tf.keras.layers.Dense(50, activation='relu')(x)
+    
+
+    # elbow_best
+    # x = tf.keras.layers.Dense(128, activation='relu')(pretrained_model.output)
+    # x = tf.keras.layers.Dropout(0.5)(x)
+    # x = tf.keras.layers.Dense(50, activation='relu')(x)
+    # x = tf.keras.layers.Dropout(0.3)(x)
+
 
     # outputs Dense '2' because of 2 classes, fratured and normal
     outputs = tf.keras.layers.Dense(2, activation='softmax')(x)
     model = tf.keras.Model(inputs, outputs)
     optimizer = Adam(learning_rate=0.0001)
+    # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-6, verbose=1)
     # print(model.summary())
+    optimizer = AdamW(learning_rate=1e-4, weight_decay=1e-5)
+    
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-6, verbose=1)
     print("-------Training " + part + "-------")
 
     # Adam optimizer with low learning rate for better accuracy
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy', AUC(name='auc')])
 
     # early stop when our model is over fit or vanishing gradient, with restore best values
+    # callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
     callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
-    history = model.fit(train_images, validation_data=val_images, epochs=25, callbacks=[callbacks, CustomWandbCallback(), LogLearningRate()])
+    history = model.fit(train_images, validation_data=val_images, epochs=25, callbacks=[[callbacks,reduce_lr], CustomWandbCallback(), LogLearningRate()])
 
+    # # For Confusion Matrix
     # Log confusion matrix
-    y_pred = model.predict(val_images)
-    y_pred_classes = np.argmax(y_pred, axis=1)
-    y_true = val_images.classes
-    class_names = list(val_images.class_indices.keys())
 
-    wandb.sklearn.plot_confusion_matrix(y_true, y_pred_classes, labels=class_names, title=f"{part} Confusion Matrix")
+    # y_pred = model.predict(val_images)
+    # y_pred_classes = np.argmax(y_pred, axis=1)
+    # y_true = val_images.classes
+    # class_names = list(val_images.class_indices.keys())
+
+    # Plot Confusion Matrix
+    # cm = confusion_matrix(y_true, y_pred_classes)
+    # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+    # fig, ax = plt.subplots(figsize=(6, 6))
+    # disp.plot(ax=ax)
+    # ax.set_title(f"{part} Confusion Matrix")
+    # wandb.log({f"{part} Confusion Matrix": wandb.Image(fig)})
 
 
     # save model to this path
@@ -217,6 +235,6 @@ def trainPart(part):
     wandb.save(model_path)
 
 # run the function and create model for each parts in the array
-categories_parts = ["Elbow", "Hand", "Shoulder"]
+categories_parts = ["Shoulder"]
 for category in categories_parts:
     trainPart(category)
