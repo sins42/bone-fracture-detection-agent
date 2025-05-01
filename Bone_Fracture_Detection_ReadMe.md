@@ -133,12 +133,19 @@ colorama~=0.4.5
 
 ## How to Run
 ```bash
-python main.py
+python prediction_for_chatbot.py
 ```
 
-Or if running GUI:
+## How to Train
+Login to your wandb account
+
+For hand, shoulder, elbow detection models
 ```bash
-python mainGUI.py
+python training_fracture.py
+```
+For categorize model
+```bash
+python training_parts.py
 ```
 
 ---
@@ -183,7 +190,53 @@ Based on [Alkoby/Bone-Fracture-Detection](https://github.com/Alkoby/Bone-Fractur
 ---
 
 ## Team
-
-| ![Caslow Chien](https://avatars.githubusercontent.com/u/99608452?v=4) | ![Serena Theobald](https://avatars.githubusercontent.com/u/) |
-|:--:|:--:|
-| **[Caslow Chien](https://github.com/CaslowChien)**<br>[🌐 Website](https://caslowchien.github.io/caslow.github.io/)<br>[💼 LinkedIn](https://www.linkedin.com/in/caslow/)<br>[📧 Email](mailto:caslow@bu.edu) | **Serena Theobald**<br>[📘 Facebook](https://www.facebook.com/yuan0727)<br>[💼 LinkedIn](https://www.linkedin.com/in/jessiechin727/)<br>[📧 Email](mailto:yuan2001@live.com) |
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/CaslowChien">
+          <img src="https://avatars.githubusercontent.com/u/99608452?v=4" width="100px;" alt="Caslow Chien"/>
+          <br />
+          <b>Caslow Chien</b>
+        </a>
+        <a href="https://caslowchien.github.io/caslow.github.io/" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Avatar_user_enterprise.png" width="20px;" alt="Website"/>
+        </a> 
+        <a href="https://www.linkedin.com/in/caslow/" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/108px-LinkedIn_icon.svg.png" width="20px;" alt="LinkedIn"/>
+        </a>
+        <a href="mailto:caslow@bu.edu" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Email_icon.svg" width="20px;" alt="Email"/>
+        </a>
+      </td>
+     <td align="center">
+        <a href="https://github.com/">
+          <img src="https://avatars.githubusercontent.com/u/" width="100px;" alt="Serena Theobald"/>
+          <br />
+          <b>Serena Theobald</b>
+        </a>
+        <a href="https://www.facebook.com/yuan0727" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Facebook_icon.svg" width="20px;" alt="Facebook"/>
+        </a> 
+        <a href="https://www.linkedin.com/in/jessiechin727/" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/108px-LinkedIn_icon.svg.png" width="20px;" alt="LinkedIn"/>
+        </a>
+        <a href="mailto:yuan2001@live.com" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Email_icon.svg" width="20px;" alt="Email"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/sins42">
+          <img src="https://avatars.githubusercontent.com/u/132231904?v=4" width="100px;" alt="Sindhuja Kumar"/>
+          <br />
+          <b>Sindhuja Kumar</b>
+        </a>
+        <a href="https://www.linkedin.com/in/sindhuja-kumar/" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/108px-LinkedIn_icon.svg.png" width="20px;" alt="LinkedIn"/>
+        </a>
+        <a href="mailto:sins@bu.edu" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Email_icon.svg" width="20px;" alt="Email"/>
+        </a>
+    </tr>
+  </table>
+</div>
