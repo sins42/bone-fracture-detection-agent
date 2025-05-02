@@ -274,10 +274,10 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr
 
 ## DEMO
 ### Positive Case
-<img src="./positive-hand-fracture-demo.gif" width="50%" height="50%"/>
+<img src="./images/positive-hand-fracture-demo.gif" width="50%" height="50%"/>
 
 ### Negative Case
-<img src="./negative-hand-fracture-demo.gif" width="50%" height="50%"/>
+<img src="./images/negative-hand-fracture-demo.gif" width="50%" height="50%"/>
 
 **Disclaimer**: SkeletaX is designed as an educational and informational tool only. It is not intended to replace professional medical advice, diagnosis, or treatment. Always seek the advice of qualified healthcare providers with any questions regarding medical conditions.
 
