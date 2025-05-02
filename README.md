@@ -225,6 +225,13 @@ The project structure of `llm-poc`:
 - `ollama_llm.py` - LLM integration
 - `prediction_for_chatbot.py` - X-ray classification
 
+## DEMO
+### Positive Case
+<img src="./images/positive-hand-fracture-demo.gif" width="50%" height="50%"/>
+
+### Negative Case
+<img src="./images/negative-hand-fracture-demo.gif" width="50%" height="50%"/>
+
 ---
 
 ## Results
@@ -271,13 +278,6 @@ reset to baseline
 AdamW(learning_rate=1e-4, weight_decay=1e-5)
 callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-6, verbose=1)
-
-## DEMO
-### Positive Case
-<img src="./images/positive-hand-fracture-demo.gif" width="50%" height="50%"/>
-
-### Negative Case
-<img src="./images/negative-hand-fracture-demo.gif" width="50%" height="50%"/>
 
 **Disclaimer**: SkeletaX is designed as an educational and informational tool only. It is not intended to replace professional medical advice, diagnosis, or treatment. Always seek the advice of qualified healthcare providers with any questions regarding medical conditions.
 
