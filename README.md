@@ -274,11 +274,10 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr
 
 ## DEMO
 ### Positive Case
-![Positive Case Demo](positive-hand-fracture-demo.mp4)
+<img src="./positive-hand-fracture-demo.gif" width="50%" height="50%"/>
 
 ### Negative Case
-![Negative Case Demo](negative-hand-fracture-demo.mp4)
-
+<img src="./negative-hand-fracture-demo.gif" width="50%" height="50%"/>
 
 **Disclaimer**: SkeletaX is designed as an educational and informational tool only. It is not intended to replace professional medical advice, diagnosis, or treatment. Always seek the advice of qualified healthcare providers with any questions regarding medical conditions.
 
@@ -292,7 +291,7 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr
           <br />
           <b>Caslow Chien</b>
         </a>
-        <a href="https://caslowchien.github.io/caslow.github.io/" target="_blank">
+        <a href="https://caslowchien.github.io/portfolio/" target="_blank">
           <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Avatar_user_enterprise.png" width="20px;" alt="Website"/>
         </a> 
         <a href="https://www.linkedin.com/in/caslow/" target="_blank">
